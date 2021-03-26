@@ -7,19 +7,18 @@ const AddTask = () => {
             </div>
 
             <div className='form-control'>
-                <label>Task</label>
-                <input type='text' placeholder='Add Task'></input>
+                <label>Day & Time</label>
+                <input type='text' placeholder='Day & Time'></input>
             </div>
 
-            <div className='form-control'>
-                <label>Task</label>
-                <input type='text' placeholder='Add Task'></input>
+            <div className='form-control form-control-check'>
+                <label>Set Reminder</label>
+                <input type='checkbox'></input>
             </div>
 
-            <div className='form-control'>
-                <label>Task</label>
-                <input type='text' placeholder='Add Task'></input>
-            </div>
+            
+            <input type='submit' value='Save Task' className='btn btn-block'></input>
+           
 
         </form>
     )
