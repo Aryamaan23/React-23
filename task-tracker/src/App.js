@@ -30,6 +30,16 @@ const App=() => {
     }
 ]
 )
+ //Delete Task
+ // eslint-disable-next-line
+ const deleteTask=(id)=>{
+   setTasks(tasks.filter((task)=> task.id!==id))
+ }
+
+ //ToggleReminder
+ const toggleReminder=(id)=>{
+   setTasks(tasks.map((task)=> task.id===id? {...task,reminder: !task.reminder} : task))
+ }
 
   // eslint-disable-next-line 
   const name='Aryamaan'
@@ -38,7 +48,7 @@ const App=() => {
   return (
     <div className="container">
       <Header />
-      <Tasks tasks={tasks} />
+      {tasks.length >0 ? <Tasks tasks={tasks} onDelete={deleteTask} onToggle={toggleReminder} /> : ('No Tasks To Show') }
     </div>
     
   );
