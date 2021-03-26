@@ -2,7 +2,7 @@
 import {useState} from 'react'
 
 
-const AddTask = () => {
+const AddTask = ({onAdd}) => {
     // eslint-disable-next-line
     const [text,setText]=useState('')
      // eslint-disable-next-line
@@ -10,8 +10,23 @@ const AddTask = () => {
      // eslint-disable-next-line
     const [reminder,setReminder]=useState(false)
 
+    const onSubmit=(e)=>{
+        e.preventDefault()
+
+        if(!text){
+            alert('Please add a task')
+            return
+        }
+
+        onAdd({text,day,reminder})
+
+        setText('')
+        setDay('')
+        setReminder(false)
+    }
+
     return (
-        <form className='add-form'>
+        <form className='add-form' onSubmit={onSubmit}>
             <div className='form-control'>
                 <label>Task</label>
                 <input type='text' placeholder='Add Task' value={text} onChange={(e)=>setText(e.target.value)}></input>
@@ -24,7 +39,7 @@ const AddTask = () => {
 
             <div className='form-control form-control-check'>
                 <label>Set Reminder</label>
-                <input type='checkbox' onChange={(e)=>setReminder(e.currentTarget.checked)}></input>
+                <input type='checkbox' checked={reminder} value={reminder} onChange={(e)=>setReminder(e.currentTarget.checked)}></input>
             </div>
 
             

@@ -33,6 +33,19 @@ const App=() => {
     }
 ]
 )
+
+//Add Task
+ // eslint-disable-next-line
+const addTask=(task)=>{
+  // eslint-disable-next-line
+  const id=Math.floor(Math.random() *10000)+1
+  // eslint-disable-next-line
+  const newTask={id, ...task}
+  setTasks([...tasks,newTask])
+}
+
+
+
  //Delete Task
  // eslint-disable-next-line
  const deleteTask=(id)=>{
@@ -51,7 +64,7 @@ const App=() => {
   return (
     <div className="container">
       <Header />
-      <AddTask />
+      <AddTask onAdd={addTask} />
       {tasks.length >0 ? <Tasks tasks={tasks} onDelete={deleteTask} onToggle={toggleReminder} /> : ('No Tasks To Show') }
     </div>
     
