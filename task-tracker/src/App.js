@@ -1,76 +1,123 @@
-//eslint-disable-next-line
-import logo from './logo.svg';
-import './App.css';
-import React from 'react';
+
+import { useState, useEffect } from 'react'
+import { BrowserRouter as Router, Route } from 'react-router-dom'
 import Header from './components/Header'
+import Footer from './components/Footer'
 import Tasks from './components/Tasks'
- // eslint-disable-next-line
 import AddTask from './components/AddTask'
+import About from './components/About'
 
-// eslint-disable-next-line
-import {useState} from 'react'
+const App = () => {
+  const [showAddTask, setShowAddTask] = useState(false)
+  const [tasks, setTasks] = useState([])
 
-const App=() => {
-  // eslint-disable-next-line
-  const [showAddTask,setShowAddTask]=useState(false)
-  // eslint-disable-next-line
-  const [tasks,setTasks]=useState([
-    {
-        id:1,
-        text:'Doctors Appointment',
-        day:'Feb 5th at 2.30pm',
-        reminder:true,
-    },
-    {
-        id:2,
-        text:'Meeting at School',
-        day:'Feb 6th at 1.30pm',
-        reminder:true,
-    },
-    {
-        id:3,
-        text:'Food Shopping',
-        day:'Feb 5th at 2.30pm',
-        reminder:false,
+  useEffect(() => {
+    const getTasks = async () => {
+      const tasksFromServer = await fetchTasks()
+      setTasks(tasksFromServer)
     }
-]
-)
 
-//Add Task
- // eslint-disable-next-line
-const addTask=(task)=>{
-  // eslint-disable-next-line
-  const id=Math.floor(Math.random() *10000)+1
-  // eslint-disable-next-line
-  const newTask={id, ...task}
-  setTasks([...tasks,newTask])
-}
+    getTasks()
+  }, [])
 
+  // Fetch Tasks
+  const fetchTasks = async () => {
+    const res = await fetch('http://localhost:5000/tasks')
+    const data = await res.json()
 
+    return data
+  }
 
- //Delete Task
- // eslint-disable-next-line
- const deleteTask=(id)=>{
-   setTasks(tasks.filter((task)=> task.id!==id))
- }
+  // Fetch Task
+  const fetchTask = async (id) => {
+    const res = await fetch(`http://localhost:5000/tasks/${id}`)
+    const data = await res.json()
 
- //ToggleReminder
- const toggleReminder=(id)=>{
-   setTasks(tasks.map((task)=> task.id===id? {...task,reminder: !task.reminder} : task))
- }
+    return data
+  }
 
-  // eslint-disable-next-line 
-  const name='Aryamaan'
-  // eslint-disable-next-line
-  const x=true
+  // Add Task
+  const addTask = async (task) => {
+    const res = await fetch('http://localhost:5000/tasks', {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json',
+      },
+      body: JSON.stringify(task),
+    })
+
+    const data = await res.json()
+
+    setTasks([...tasks, data])
+
+    // const id = Math.floor(Math.random() * 10000) + 1
+    // const newTask = { id, ...task }
+    // setTasks([...tasks, newTask])
+  }
+
+  // Delete Task
+  const deleteTask = async (id) => {
+    const res = await fetch(`http://localhost:5000/tasks/${id}`, {
+      method: 'DELETE',
+    })
+    //We should control the response status to decide if we will change the state or not.
+    res.status === 200
+      ? setTasks(tasks.filter((task) => task.id !== id))
+      : alert('Error Deleting This Task')
+  }
+
+  // Toggle Reminder
+  const toggleReminder = async (id) => {
+    const taskToToggle = await fetchTask(id)
+    const updTask = { ...taskToToggle, reminder: !taskToToggle.reminder }
+
+    const res = await fetch(`http://localhost:5000/tasks/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-type': 'application/json',
+      },
+      body: JSON.stringify(updTask),
+    })
+
+    const data = await res.json()
+
+    setTasks(
+      tasks.map((task) =>
+        task.id === id ? { ...task, reminder: data.reminder } : task
+      )
+    )
+  }
+
   return (
-    <div className="container">
-      <Header onAdd={()=>setShowAddTask(!showAddTask)} showAdd={showAddTask} />
-      {showAddTask && <AddTask onAdd={addTask} />}
-      {tasks.length >0 ? <Tasks tasks={tasks} onDelete={deleteTask} onToggle={toggleReminder} /> : ('No Tasks To Show') }
-    </div>
-    
-  );
+    <Router>
+      <div className='container'>
+        <Header
+          onAdd={() => setShowAddTask(!showAddTask)}
+          showAdd={showAddTask}
+        />
+        <Route
+          path='/'
+          exact
+          render={(props) => (
+            <>
+              {showAddTask && <AddTask onAdd={addTask} />}
+              {tasks.length > 0 ? (
+                <Tasks
+                  tasks={tasks}
+                  onDelete={deleteTask}
+                  onToggle={toggleReminder}
+                />
+              ) : (
+                'No Tasks To Show'
+              )}
+            </>
+          )}
+        />
+        <Route path='/about' component={About} />
+        <Footer />
+      </div>
+    </Router>
+  )
 }
 
-export default App;
+export default App
